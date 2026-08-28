@@ -3,17 +3,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الورد اليومي</title>
+    <title>وِرد - القرآن والأذكار</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
-        h1 { color: #2c3e50; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px auto; max-width: 400px; }
+        :root {
+            --bg-dark: #0d1b1e;
+            --card-bg: #152a2d;
+            --accent-gold: #d4af37;
+            --accent-gold-hover: #b89628;
+            --text-light: #e0e6ed;
+            --text-muted: #8a9ba8;
+            --border-color: #1f3a3e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 15px 10px;
+        }
+
+        header h1 {
+            font-family: 'Amiri', serif;
+            color: var(--accent-gold);
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Banner Card */
+        .kahf-banner {
+            background: linear-gradient(135deg, #152a2d 0%, #1e3c40 100%);
+            border: 1px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            display: none; /* Controlled by JS */
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kahf-info h3 {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .kahf-info p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .btn-gold {
+            background-color: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-title {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Cards & List Items */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .dhikr-text {
+            font-family: 'Amiri', serif;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .dhikr-counter-btn {
+            width: 100%;
+            background-color: var(--border-color);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dhikr-counter-btn.completed {
+            background-color: #27ae60;
+            color: #fff;
+            border-color: #27ae60;
+        }
+
+        /* Learning Accordion */
+        .accordion-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 15px;
+            font-weight: bold;
+            color: var(--accent-gold);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .accordion-body {
+            padding: 15px;
+            display: none;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-light);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .accordion-body ul {
+            padding-right: 20px;
+            margin-top: 8px;
+        }
+
+        .accordion-body li {
+            margin-bottom: 6px;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #091315;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 20%;
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        .quran-frame {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>تطبيق الورد اليومي</h1>
-        <p>أهلاً بك في تطبيق الورد والأذكار</p>
+
+    <header>
+        <h1>وِرد</h1>
+        <div class="date-display" id="current-date">الجمعة 28 أغسطس</div>
+    </header>
+
+    <div class="container">
+        <!-- الجمعة فقط: تذكير سورة الكهف -->
+        <div class="kahf-banner" id="kahf-banner">
+            <div class="kahf-info">
+                <h3>اليوم الجمعة 🌙</h3>
+                <p>وردك اليومي: سورة الكهف</p>
+            </div>
+            <button class="btn-gold" onclick="switchTab('quran', true)">اقرأ الآن</button>
+        </div>
+
+        <!-- الرئيسية -->
+        <div id="home-tab" class="tab-content active">
+            <div class="stats-card">
+                <div class="stats-title">ملخص الإنجاز اليومي</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="completed-adhkar">0/4</div>
+                        <div class="stat-label">الأذكار المكتملة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-presses">0</div>
+                        <div class="stat-label">مجموع التسبيحات</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--accent-gold); margin-bottom: 8px;">آية اليوم</h3>
+                <p class="dhikr-text" style="font-size: 1.1rem; text-align: center;">"فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ"</p>
+            </div>
+        </div>
+
+        <!-- الأذكار -->
+        <div id="adhkar-tab" class="tab-content">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">أذكار اليوم</h2>
+            
+            <div class="card">
+                <div class="dhikr-text">أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ</div>
+                <button class="dhikr-counter-btn" onclick="count(this, 100)">100</button>
+            </div>
+
+            <div class="card">
+                <div class="dhikr-text">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ</div>
+                <button class="dhikr-counter-btn" onclick="count(this, 33)">33</button>
+            </div>
+
+            <div class="card">
+                <div class="dhikr-text">اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ</div>
+                <button class="dhikr-counter-btn" onclick="count(this, 10)">10</button>
+            </div>
+
+            <div class="card">
+                <div class="dhikr-text">لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ</div>
+                <button class="dhikr-counter-btn" onclick="count(this, 10)">10</button>
+            </div>
+        </div>
+
+        <!-- القرآن الكريم -->
+        <div id="quran-tab" class="tab-content">
+            <h2 style="color: var(--accent-gold); margin-bottom: 10px;">القرآن الكريم</h2>
+            <iframe class="quran-frame" src="https://quran.com/ar" title="القرآن الكريم"></iframe>
+        </div>
+
+        <!-- تعلم الصلاة -->
+        <div id="prayer-tab" class="tab-content">
+            <h2 style="color: var(--accent-gold); margin-bottom: 15px;">تعلم الصلاة والوضوء</h2>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>💧 كيفية الوضوء الصحيح</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-body">
+                    <ol>
+                        <li>النية ومحلها القلب ثم التسمية (بسم الله).</li>
+                        <li>غسل الكفين ثلاث مرات.</li>
+                        <li>المضمضة والاستنشاق ثلاث مرات.</li>
+                        <li>غسل الوجه كاملاً ثلاث مرات.</li>
+                        <li>غسل اليدين إلى المرفقين ثلاث مرات (البدء باليمنى).</li>
+                        <li>مسح الرأس والأذنين مرة واحدة.</li>
+                        <li>غسل الرجلين إلى الكعبين ثلاث مرات (البدء باليمنى).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>🕌 صفة الصلاة الصحيحة</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-body">
+                    <ul>
+                        <li>استقبال القبلة والنية.</li>
+                        <li>تكبيرة الإحرام (الله أكبر) مع رفع اليدين حذو المنكبين.</li>
+                        <li>قراءة الفاتحة وما تيسر من القرآن.</li>
+                        <li>الركوع والاطمئنان فيه وقول (سبحان ربي العظيم) 3 مرات.</li>
+                        <li>الرفع من الركوع وقول (سمع الله لمن حمده).</li>
+                        <li>السجود على الأعضاء السبعة والاطمئنان وقول (سبحان ربي الأعلى) 3 مرات.</li>
+                        <li>الجلوس بين السجدتين والتطوع بالدعاء.</li>
+                        <li>التشهد الأخير والتسليم.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>⚠️ أخطاء متكررة في الصلاة تجنبها</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-body">
+                    <ul>
+                        <li><strong>مسابقة الإمام:</strong> الحركة قبل حركة الإمام تبطل الصلاة أو تنقص أجرها.</li>
+                        <li><strong>عدم الطمأنينة:</strong> السرعة الشديدة (النقر) تمنع ركن الطمأنينة.</li>
+                        <li><strong>عدم إسباغ الوضوء:</strong> ترك أجزاء من القدم أو الكعبين جافة.</li>
+                        <li><strong>رفع النظر إلى السماء:</strong> الواجب النظر إلى موضع السجود.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- الشريط السفلي -->
+    <nav class="navbar">
+        <div class="nav-item active" onclick="switchTab('home', this)">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('adhkar', this)">
+            <span class="nav-icon">📿</span>
+            <span>الأذكار</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('quran', this)">
+            <span class="nav-icon">📖</span>
+            <span>القرآن</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('prayer', this)">
+            <span class="nav-icon">🕌</span>
+            <span>الصلاة</span>
+        </div>
+    </nav>
+
+    <script>
+        let totalPresses = 0;
+        let completedCount = 0;
+
+        // إظهار بانر سورة الكهف أيام الجمعة فقط
+        function checkFriday() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 5 = الجمعة
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = today.toLocaleDateString('ar-EG', options);
+
+            if (dayOfWeek === 5) {
+                document.getElementById('kahf-banner').style.display = 'flex';
+            } else {
+                document.getElementById('kahf-banner').style.display = 'none';
+            }
+        }
+
+        function switchTab(tabName, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            if (el && el.classList) {
+                el.classList.add('active');
+            } else {
+                // لو تم الضغط من مكان آخر زى زرار الكهف
+                const index = tabName === 'home' ? 0 : tabName === 'adhkar' ? 1 : tabName === 'quran' ? 2 : 3;
+                document.querySelectorAll('.nav-item')[index].classList.add('active');
+            }
+        }
+
+        function count(btn, max) {
+            let current = parseInt(btn.innerText);
+            totalPresses++;
+            document.getElementById('total-presses').innerText = totalPresses;
+
+            if (current > 1) {
+                btn.innerText = current - 1;
+            } else if (current === 1) {
+                btn.innerText = "تمت القراءة ✓";
+                btn.classList.add("completed");
+                btn.disabled = true;
+                completedCount++;
+                document.getElementById('completed-adhkar').innerText = completedCount + "/4";
+            }
+        }
+
+        function toggleAccordion(header) {
+            const body = header.nextElementSibling;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            header.querySelector('span:last-child').innerText = isOpen ? '▼' : '▲';
+        }
+
+        // تشغيل فحص اليوم فور التحميل
+        checkFriday();
+    </script>
 </body>
 </html>
+
